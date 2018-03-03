@@ -5,8 +5,6 @@ CMD ["/sbin/my_init"]
 ENV DEBIAN_FRONTEND noninteractive
 ENV COMPOSER_ALLOW_SUPERUSER 1
 
-ARG REPO
-
 # Expose ports
 EXPOSE 80 22
 
@@ -74,16 +72,3 @@ RUN sed -i \
         -e 's|root /home/USER/www/html|root   /usr/share/nginx/html|' \
         -e 's|unix:/var/run/php5-fpm.sock;|unix:/run/php/php7.0-fpm.sock;|' \
     /etc/nginx/sites-available/default
-
-# Clone a site repo if the REPO build argument is provided
-RUN if [ ! -z "$REPO" ]; then\
-  mkdir tmp-repo &&\
-  git clone ${REPO} tmp-repo &&\
-  rm -rf user &&\
-  cp -R tmp-repo/user . &&\
-  rm -rf tmp-repo && \
-  chown -R www-data:www-data user; \
-  fi
-
-# Expose configuration and content volumes
-VOLUME /etc/nginx/ /usr/share/nginx/html/
