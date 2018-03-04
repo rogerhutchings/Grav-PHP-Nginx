@@ -74,9 +74,9 @@ RUN sed -i \
     /etc/nginx/sites-available/default
 
 # Create entrypoint script to fix permissions for mounted `userDir` volume
-RUN touch /entrypoint.sh
-RUN chmod +x /entrypoint.sh
-RUN echo '#!/bin/bash \n\
-    chown -R www-data:www-data /usr/share/nginx/html/user' \
-    >> /entrypoint.sh
-ENTRYPOINT ["/entrypoint.sh"]
+# RUN touch /entrypoint.sh
+# RUN chmod +x /entrypoint.sh
+# RUN echo '#!/bin/bash \n\
+#     chown -R www-data:www-data /usr/share/nginx/html/user' \
+#     >> /entrypoint.sh
+# ENTRYPOINT ["/entrypoint.sh"]
