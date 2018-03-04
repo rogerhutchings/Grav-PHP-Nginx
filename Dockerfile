@@ -73,10 +73,13 @@ RUN chmod +x /entrypoint.sh
 RUN echo '#!/bin/bash' >> /entrypoint.sh
 RUN echo 'cd /usr/share/nginx/html' >> /entrypoint.sh
 RUN echo 'chown -R www-data:www-data *' >> /entrypoint.sh
-RUN echo 'find . -type f | xargs chmod 664' >> /entrypoint.sh
-RUN echo 'find . -type d | xargs chmod 775' >> /entrypoint.sh
-RUN echo 'find . -type d | xargs chmod +s' >> /entrypoint.sh
+RUN echo 'find . -type f -exec chmod 664 {} \;' >> /entrypoint.sh
+RUN echo 'find . -type d -exec chmod 755 {} \;' >> /entrypoint.sh
+RUN echo 'find . -type d -exec chmod +s {} \;' >> /entrypoint.sh
 RUN echo 'umask 0002' >> /entrypoint.sh
 RUN echo 'chmod +x bin/*' >> /entrypoint.sh
 RUN echo 'exec "$@"' >> /entrypoint.sh
 ENTRYPOINT ["/entrypoint.sh"]
+
+# Expose configuration and content volumes
+VOLUME /etc/nginx/ /usr/share/nginx/html/
