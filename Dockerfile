@@ -42,12 +42,6 @@ WORKDIR /usr/share/nginx/html/
 RUN bin/composer.phar self-update
 RUN bin/grav install
 RUN bin/gpm selfupgrade -nyq
-RUN chown -R www-data:www-data *
-RUN find . -type f | xargs chmod 664
-RUN find . -type d | xargs chmod 775
-RUN find . -type d | xargs chmod +s
-RUN umask 0002
-RUN chmod +x bin/*
 
 # Setup Grav configuration for Nginx
 RUN touch /etc/nginx/grav_conf.sh
@@ -77,6 +71,12 @@ RUN sed -i \
 RUN touch /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 RUN echo '#!/bin/bash' >> /entrypoint.sh
-RUN echo 'chown -R www-data:www-data /usr/share/nginx/html/user' >> /entrypoint.sh
+RUN echo 'cd /usr/share/nginx/html' >> /entrypoint.sh
+RUN echo 'chown -R www-data:www-data *' >> /entrypoint.sh
+RUN echo 'find . -type f | xargs chmod 664' >> /entrypoint.sh
+RUN echo 'find . -type d | xargs chmod 775' >> /entrypoint.sh
+RUN echo 'find . -type d | xargs chmod +s' >> /entrypoint.sh
+RUN echo 'umask 0002' >> /entrypoint.sh
+RUN echo 'chmod +x bin/*' >> /entrypoint.sh
 RUN echo 'exec "$@"' >> /entrypoint.sh
 ENTRYPOINT ["/entrypoint.sh"]
