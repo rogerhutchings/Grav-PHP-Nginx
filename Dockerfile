@@ -5,6 +5,8 @@ CMD ["/sbin/my_init"]
 ENV DEBIAN_FRONTEND noninteractive
 ENV COMPOSER_ALLOW_SUPERUSER 1
 
+ARG REPO
+
 # Expose ports
 EXPOSE 80 22
 
@@ -67,19 +69,22 @@ RUN sed -i \
         -e 's|unix:/var/run/php5-fpm.sock;|unix:/run/php/php7.0-fpm.sock;|' \
     /etc/nginx/sites-available/default
 
-# Create entrypoint script to fix permissions for mounted `userDir` volume
-RUN touch /entrypoint.sh
-RUN chmod +x /entrypoint.sh
-RUN echo '#!/bin/bash' >> /entrypoint.sh
-RUN echo 'cd /usr/share/nginx/html' >> /entrypoint.sh
-RUN echo 'chown -R www-data:www-data *' >> /entrypoint.sh
-RUN echo 'find . -type f -exec chmod 664 {} \;' >> /entrypoint.sh
-RUN echo 'find . -type d -exec chmod 755 {} \;' >> /entrypoint.sh
-RUN echo 'find . -type d -exec chmod +s {} \;' >> /entrypoint.sh
-RUN echo 'umask 0002' >> /entrypoint.sh
-RUN echo 'chmod +x bin/*' >> /entrypoint.sh
-RUN echo 'exec "$@"' >> /entrypoint.sh
-ENTRYPOINT ["/entrypoint.sh"]
+# Clone a site repo if the REPO build argument is provided
+RUN if [ ! -z "$REPO" ]; then\
+  mkdir tmp-repo &&\
+  git clone ${REPO} tmp-repo &&\
+  rm -rf user &&\
+  cp -R tmp-repo/user . &&\
+  rm -rf tmp-repo;\
+  fi
+
+# Fix permissions
+RUN chown -R www-data:www-data *
+RUN find . -type f | xargs chmod 664
+RUN find . -type d | xargs chmod 775
+RUN find . -type d | xargs chmod +s
+RUN umask 0002
+RUN chmod +x bin/*
 
 # Expose configuration and content volumes
 VOLUME /etc/nginx/ /usr/share/nginx/html/
