@@ -72,3 +72,11 @@ RUN sed -i \
         -e 's|root /home/USER/www/html|root   /usr/share/nginx/html|' \
         -e 's|unix:/var/run/php5-fpm.sock;|unix:/run/php/php7.0-fpm.sock;|' \
     /etc/nginx/sites-available/default
+
+# Create entrypoint script to fix permissions for mounted `userDir` volume
+RUN touch /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+RUN echo '#!/bin/bash \n\
+    chown -R www-data:www-data /usr/share/nginx/html/user' \
+    >> /entrypoint.sh
+ENTRYPOINT ["/entrypoint.sh"]
