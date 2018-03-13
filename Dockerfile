@@ -78,6 +78,9 @@ RUN if [ ! -z "$REPO" ]; then\
   rm -rf tmp-repo;\
   fi
 
+# Add in backups directory
+RUN mkdir backup
+
 # Fix permissions
 RUN chown -R www-data:www-data *
 RUN find . -type f | xargs chmod 664
