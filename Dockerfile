@@ -79,7 +79,7 @@ RUN if [ ! -z "$REPO" ]; then\
   fi
 
 # Add in backups directory
-RUN mkdir backup
+RUN mkdir -p backup
 
 # Fix permissions
 RUN chown -R www-data:www-data *
